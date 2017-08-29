@@ -1,0 +1,15 @@
+p p1 14 nl
+r r 14 nl
+c c1 8 nl
+t t 14 nl
+p p1 14 nl
+r r 14 nl
+c c 6 nl
+t t 14 nl
+p p2 8 nl
+r r 14 nl
+c c 4 nl
+t t 14 nl
+# Arcs
+c1 rep p2
+x rep c1-p2

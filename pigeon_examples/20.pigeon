@@ -1,0 +1,11 @@
+p plac 3
+> RBS 4
+c GNA1 9
+> RBS 4
+c PCM1 8
+> RBS 4
+c UAPM1 5
+> RBS 4 
+c CHS3 12
+<t stop 6
+# Arcs
