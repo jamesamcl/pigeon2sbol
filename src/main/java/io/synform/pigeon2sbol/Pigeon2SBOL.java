@@ -114,6 +114,7 @@ public class Pigeon2SBOL
             }
 
             ComponentDefinition subCD = doc.createComponentDefinition(id, ComponentDefinition.DNA);
+            subCD.setName(name);
 
             Component subC = rootCD.createComponent(subCD.getDisplayId() + "_component", AccessType.PUBLIC, subCD.getDisplayId());
 
