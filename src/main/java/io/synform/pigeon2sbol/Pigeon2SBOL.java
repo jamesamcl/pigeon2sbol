@@ -1,3 +1,6 @@
+
+package io.synform.pigeon2sbol;
+
 import org.sbolstandard.core2.*;
 
 import java.io.*;
