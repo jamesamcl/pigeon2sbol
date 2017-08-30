@@ -121,10 +121,28 @@ public class Pigeon2SBOL
 
             orientations.put(subC.getIdentity().toString(), orientation);
 
-            if(type.equals("c")) {
+            if(type.equals("c") || type.equals("g") || type.equals("g'")) {
                 subCD.addRole(SequenceOntology.CDS);
-            } else if(type.equals("p")) {
+            } else if(type.equals("p") || type.equals("P")) {
                 subCD.addRole(SequenceOntology.PROMOTER);
+            } else if(type.equals("t") || type.equals("T")) {
+                subCD.addRole(SequenceOntology.TERMINATOR);
+            } else if(type.equals("x")) {
+                subCD.addRole(SequenceOntology.RESTRICTION_ENZYME_RECOGNITION_SITE);
+            } else if(type.equals("z")) {
+                subCD.addRole(SequenceOntology.ORIGIN_OF_REPLICATION);
+            } else if(type.equals("=")) {
+                subCD.addRole(URI.create("http://identifiers.org/so/SO:0001953"));
+            } else if(type.equals("i")) {
+                subCD.addRole(URI.create("http://identifiers.org/so/SO:0001979"));
+            } else if(type.equals("<") || type.equals(">")) {
+                subCD.addRole(URI.create("http://identifiers.org/so/SO:0000342"));
+            } else if(type.equals("o")) {
+                subCD.addRole(URI.create("http://identifiers.org/so/SO:0001695"));
+            } else if(type.equals("v")) {
+                subCD.addRole(URI.create("http://identifiers.org/so/SO:0000988"));
+            } else if(type.equals("r")) {
+                subCD.addRole(SequenceOntology.RIBOSOME_ENTRY_SITE);
             }
 
             if(tokens.length >= 4) {
