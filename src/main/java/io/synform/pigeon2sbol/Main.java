@@ -8,12 +8,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, SBOLConversionException, SBOLValidationException {
+    public static void main(String[] args) throws IOException, SBOLConversionException, SBOLValidationException, URISyntaxException {
 
-        FileInputStream is = new FileInputStream("./pigeon_examples/1.pigeon");
+        FileInputStream is = new FileInputStream("./pigeon_examples/2.pigeon");
 
         Pigeon2SBOL.pigeon2SBOL(is).write(new FileOutputStream("out.xml"));
 

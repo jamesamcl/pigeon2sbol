@@ -5,6 +5,7 @@ import org.sbolstandard.core2.*;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.Set;
  */
 public class Pigeon2SBOL
 {
-    static SBOLDocument pigeon2SBOL(InputStream is) throws IOException, SBOLValidationException {
+    static SBOLDocument pigeon2SBOL(InputStream is) throws IOException, SBOLValidationException, URISyntaxException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         SBOLDocument doc = new SBOLDocument();
@@ -48,7 +49,6 @@ public class Pigeon2SBOL
         HashSet<String> identifiersUsed = new HashSet<String>();
         HashSet<String> identifiersReferenced = new HashSet<String>();
 
-        HashMap<String, OrientationType> orientations = new HashMap<String, OrientationType>();
 
         boolean parsingArcs = false;
         int readingColors = 0;
@@ -117,10 +117,7 @@ public class Pigeon2SBOL
             subCD.setName(name);
 
             Component subC = rootCD.createComponent(subCD.getDisplayId() + "_component", AccessType.PUBLIC, subCD.getDisplayId());
-
             subComponentsInOrder.add(subC);
-
-            orientations.put(subC.getIdentity().toString(), orientation);
 
             if(type.equals("c") || type.equals("g") || type.equals("g'")) {
                 subCD.addRole(SequenceOntology.CDS);
@@ -146,6 +143,9 @@ public class Pigeon2SBOL
                 subCD.addRole(SequenceOntology.RIBOSOME_ENTRY_SITE);
             }
 
+            SequenceAnnotation sa = rootCD.createSequenceAnnotation(subC.getDisplayId() + "_sa", "location", orientation);
+            sa.setComponent(subC.getIdentity());
+
             if(tokens.length >= 4) {
 
                 if(!tokens[3].equalsIgnoreCase("nl")) {
@@ -164,16 +164,9 @@ public class Pigeon2SBOL
         for(int i = subComponentsInOrder.size() - 2; i >= 0; -- i) {
 
             Component cur = subComponentsInOrder.get(i);
-            OrientationType curOrientation = orientations.get(cur.getIdentity().toString());
-
             Component next = subComponentsInOrder.get(i + 1);
-            OrientationType nextOrientation = orientations.get(next.getIdentity().toString());
 
             rootCD.createSequenceConstraint(getIdentifier(identifiersUsed, "p2s_order_constraint"), RestrictionType.PRECEDES, cur.getDisplayId(), next.getDisplayId());
-
-            if(curOrientation != nextOrientation) {
-                rootCD.createSequenceConstraint(getIdentifier(identifiersUsed, "p2s_orientation_constraint"), RestrictionType.OPPOSITE_ORIENTATION_AS, cur.getDisplayId(), next.getDisplayId());
-            }
 
         }
 
