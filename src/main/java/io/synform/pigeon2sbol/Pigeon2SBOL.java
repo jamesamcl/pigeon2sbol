@@ -24,6 +24,7 @@ public class Pigeon2SBOL
         doc.setDefaultURIprefix("http://api.synform.io/temp/pigeon2sbol/");
 
         ComponentDefinition rootCD = doc.createComponentDefinition("rootCD", ComponentDefinition.DNA);
+        ModuleDefinition rootMD = null;
 
 
         ArrayList<String> colors = new ArrayList<String>();
@@ -48,6 +49,9 @@ public class Pigeon2SBOL
 
         HashSet<String> identifiersUsed = new HashSet<String>();
         HashSet<String> identifiersReferenced = new HashSet<String>();
+
+        HashMap<String, Component> pigeonIdToComponent = new HashMap<String, Component>();
+        HashMap<String, FunctionalComponent> pigeonIdToFunctionalComponent = new HashMap<String, FunctionalComponent>();
 
 
         boolean parsingArcs = false;
@@ -74,7 +78,12 @@ public class Pigeon2SBOL
             }
 
             if(line.equalsIgnoreCase("# Arcs")) {
+
                 parsingArcs = true;
+
+                rootMD = doc.createModuleDefinition("rootMD");
+                rootMD.createFunctionalComponent("fcForRootCD", AccessType.PUBLIC, rootCD.getIdentity(), DirectionType.NONE);
+
                 continue;
             }
 
@@ -85,6 +94,80 @@ public class Pigeon2SBOL
                 if (tokens.length != 3) {
                     throw new Error("Expected exactly 3 tokens for arc line");
                 }
+
+                String firstId = tokens[0];
+                String secondId = tokens[2];
+                String typeStr = tokens[1];
+
+                URI type;
+
+                if(typeStr.equals("ind")) {
+
+                    type = SystemsBiologyOntology.STIMULATION;
+
+                } else if(typeStr.equals("rep")) {
+
+                    type = SystemsBiologyOntology.INHIBITION;
+
+                } else {
+
+                    throw new Error("expected ind or rep for arc type");
+
+                }
+
+
+                Interaction interaction = rootMD.createInteraction(getIdentifier(identifiersUsed, typeStr), type);
+
+                // need to create if not exists a FC for both sides of the interaction, which have mapsto pointing
+                // to the things inside the rootCD
+                // THEN add those things to the interaction
+
+
+                Component from = pigeonIdToComponent.get(firstId);
+                Component to = pigeonIdToComponent.get(secondId);
+
+                if(from == null) {
+                    throw new Error("I can't find " + firstId);
+                }
+
+                if(to == null) {
+                    throw new Error("I can't find " + secondId);
+                }
+
+                FunctionalComponent fromFC = pigeonIdToFunctionalComponent.get(firstId);
+
+                if(fromFC == null) {
+
+                    fromFC = rootMD.createFunctionalComponent(
+                            getIdentifier(identifiersUsed, from.getDisplayId() + "_fc"), AccessType.PUBLIC, from.getDefinitionURI(), DirectionType.NONE);
+
+                }
+
+                FunctionalComponent toFC = pigeonIdToFunctionalComponent.get(secondId);
+
+                if(toFC == null) {
+
+                    toFC = rootMD.createFunctionalComponent(
+                                    getIdentifier(identifiersUsed, to.getDisplayId() + "_fc"), AccessType.PUBLIC, to.getDefinitionURI(), DirectionType.NONE);
+
+                }
+
+
+
+
+                if (typeStr.equals("ind")) {
+
+                    interaction.createParticipation("from", fromFC.getIdentity(), SystemsBiologyOntology.STIMULATOR);
+                    interaction.createParticipation("to", fromFC.getIdentity(), SystemsBiologyOntology.STIMULATED);
+
+                } else if(typeStr.equals("rep")) {
+
+                    interaction.createParticipation("from", fromFC.getIdentity(), SystemsBiologyOntology.INHIBITOR);
+                    interaction.createParticipation("to", fromFC.getIdentity(), SystemsBiologyOntology.INHIBITED);
+
+                }
+
+
 
                 continue;
             }
@@ -118,6 +201,10 @@ public class Pigeon2SBOL
 
             Component subC = rootCD.createComponent(subCD.getDisplayId() + "_component", AccessType.PUBLIC, subCD.getDisplayId());
             subComponentsInOrder.add(subC);
+
+            if(tokens.length >= 2) {
+                pigeonIdToComponent.put(name, subC);
+            }
 
             if(type.equals("c") || type.equals("g") || type.equals("g'")) {
                 subCD.addRole(SequenceOntology.CDS);
