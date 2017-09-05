@@ -67,6 +67,8 @@ public class Pigeon2SBOL
             if(line.length() == 0)
                 continue;
 
+            System.out.println(line);
+
             if(line.equalsIgnoreCase("rgbcolors")) {
                 readingColors = colors.size();
                 continue;
@@ -116,22 +118,17 @@ public class Pigeon2SBOL
                 }
 
 
-                Interaction interaction = rootMD.createInteraction(getIdentifier(identifiersUsed, typeStr), type);
-
-                // need to create if not exists a FC for both sides of the interaction, which have mapsto pointing
-                // to the things inside the rootCD
-                // THEN add those things to the interaction
-
-
                 Component from = pigeonIdToComponent.get(firstId);
                 Component to = pigeonIdToComponent.get(secondId);
 
                 if(from == null) {
-                    throw new Error("I can't find " + firstId);
+                    System.out.println("I can't find " + firstId);
+                    continue;
                 }
 
                 if(to == null) {
-                    throw new Error("I can't find " + secondId);
+                    System.out.println("I can't find " + secondId);
+                    continue;
                 }
 
                 FunctionalComponent fromFC = pigeonIdToFunctionalComponent.get(firstId);
@@ -148,11 +145,11 @@ public class Pigeon2SBOL
                 if(toFC == null) {
 
                     toFC = rootMD.createFunctionalComponent(
-                                    getIdentifier(identifiersUsed, to.getDisplayId() + "_fc"), AccessType.PUBLIC, to.getDefinitionURI(), DirectionType.NONE);
+                            getIdentifier(identifiersUsed, to.getDisplayId() + "_fc"), AccessType.PUBLIC, to.getDefinitionURI(), DirectionType.NONE);
 
                 }
 
-
+                Interaction interaction = rootMD.createInteraction(getIdentifier(identifiersUsed, typeStr), type);
 
 
                 if (typeStr.equals("ind")) {
