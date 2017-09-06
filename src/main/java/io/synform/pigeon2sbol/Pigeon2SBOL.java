@@ -155,12 +155,12 @@ public class Pigeon2SBOL
                 if (typeStr.equals("ind")) {
 
                     interaction.createParticipation("from", fromFC.getIdentity(), SystemsBiologyOntology.STIMULATOR);
-                    interaction.createParticipation("to", fromFC.getIdentity(), SystemsBiologyOntology.STIMULATED);
+                    interaction.createParticipation("to", toFC.getIdentity(), SystemsBiologyOntology.STIMULATED);
 
                 } else if(typeStr.equals("rep")) {
 
                     interaction.createParticipation("from", fromFC.getIdentity(), SystemsBiologyOntology.INHIBITOR);
-                    interaction.createParticipation("to", fromFC.getIdentity(), SystemsBiologyOntology.INHIBITED);
+                    interaction.createParticipation("to", toFC.getIdentity(), SystemsBiologyOntology.INHIBITED);
 
                 }
 
